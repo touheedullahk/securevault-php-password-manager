@@ -34,3 +34,10 @@ button {
 .link-line { margin-top: 22px; }
 .welcome { margin-bottom: 24px; }
 .placeholder { text-align: center; padding: 52px 24px; }
+
+
+.hint {
+    font-size: 14px;
+    margin-top: 18px;
+    color: #637086;
+}

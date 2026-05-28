@@ -12,14 +12,6 @@ class User
     {
         $username = trim($username);
 
-        if (strlen($username) < 3) {
-            return 'Username must contain at least 3 characters.';
-        }
-
-        if (strlen($password) < 8) {
-            return 'Password must contain at least 8 characters.';
-        }
-
         $check = $this->database->prepare('SELECT id FROM users WHERE username = ?');
         $check->execute([$username]);
 
@@ -28,6 +20,7 @@ class User
         }
 
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
         $statement = $this->database->prepare(
             'INSERT INTO users (username, password_hash) VALUES (?, ?)'
         );
@@ -48,8 +41,10 @@ class User
             return false;
         }
 
+        session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
+
         return true;
     }
 }
