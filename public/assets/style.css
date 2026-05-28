@@ -1,0 +1,36 @@
+* { box-sizing: border-box; }
+body {
+    margin: 0; background: #f4f7fb; color: #172033;
+    font-family: Arial, sans-serif;
+}
+.container { width: min(100% - 32px, 960px); margin: 0 auto; }
+header { background: white; border-bottom: 1px solid #dde5f0; margin-bottom: 42px; }
+.navigation {
+    min-height: 64px; display: flex; justify-content: space-between; align-items: center;
+}
+.brand { color: #172033; text-decoration: none; font-size: 21px; font-weight: bold; }
+nav { display: flex; gap: 18px; }
+nav a, a { color: #2864d7; text-decoration: none; }
+.card {
+    background: white; border: 1px solid #dde5f0;
+    border-radius: 12px; padding: 28px;
+}
+.form-card { width: min(100%, 470px); margin: 0 auto; }
+h1 { margin: 0 0 8px; }
+p { color: #637086; }
+form { margin-top: 22px; display: grid; gap: 16px; }
+label { display: grid; gap: 7px; font-weight: bold; }
+input {
+    padding: 12px; border-radius: 7px;
+    border: 1px solid #cfd9e8; font-size: 16px;
+}
+button {
+    border: 0; border-radius: 7px; background: #2864d7;
+    color: white; font-size: 16px; padding: 12px; cursor: pointer;
+}
+.message { margin: 20px 0 0; border-radius: 7px; padding: 12px; }
+.error { background: #ffe9eb; color: #a82035; }
+.success { background: #e6f8eb; color: #12652d; }
+.link-line { margin-top: 22px; }
+.welcome { margin-bottom: 24px; }
+.placeholder { text-align: center; padding: 52px 24px; }
