@@ -17,18 +17,24 @@ if (!isset($_SESSION['user_id'])) {
 <header>
     <div class="container navigation">
         <a class="brand" href="dashboard.php">SecureVault</a>
-        <nav><a href="dashboard.php">Dashboard</a><a href="logout.php">Logout</a></nav>
+        <nav>
+            <a href="dashboard.php">Dashboard</a>
+            <a href="generator.php">Generator</a>
+            <a href="logout.php">Logout</a>
+        </nav>
     </div>
 </header>
+
 <main class="container">
     <section class="welcome">
         <h1>Welcome, <?= htmlspecialchars($_SESSION['username']) ?>!</h1>
-        <p>This is the initial dashboard foundation.</p>
+        <p>The basic password generator has now been added to the project.</p>
+        <a class="button-link" href="generator.php">Open password generator</a>
     </section>
 
     <section class="card placeholder">
-        <h2>Password Vault</h2>
-        <p>Password generation and encrypted password saving will be implemented in later versions.</p>
+        <h2>Stored Password Vault</h2>
+        <p>Saving encrypted website or application passwords will be implemented in a later version.</p>
     </section>
 </main>
 </body>

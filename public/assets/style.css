@@ -41,3 +41,53 @@ button {
     margin-top: 18px;
     color: #637086;
 }
+
+
+fieldset {
+    border: 1px solid #cfd9e8;
+    border-radius: 7px;
+    padding: 14px;
+}
+
+legend {
+    padding: 0 6px;
+    font-weight: bold;
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: normal;
+    margin: 9px 0;
+}
+
+.checkbox input {
+    width: auto;
+}
+
+.button-link {
+    display: inline-block;
+    margin-top: 8px;
+    background: #2864d7;
+    color: white;
+    border-radius: 7px;
+    padding: 11px 16px;
+}
+
+.result {
+    margin-top: 24px;
+    border: 1px solid #cfe0ff;
+    background: #eff5ff;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.result p {
+    margin: 0 0 8px;
+}
+
+.result strong {
+    font-family: Consolas, monospace;
+    word-break: break-all;
+}
