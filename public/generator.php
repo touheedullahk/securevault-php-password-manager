@@ -7,9 +7,11 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once '../classes/PasswordGenerator.php';
+require_once '../classes/PasswordStrength.php';
 
 $message = '';
 $generatedPassword = '';
+$strengthResult = null;
 
 $length = (int) ($_POST['length'] ?? 12);
 $lowercaseQuantity = (int) ($_POST['lowercase_quantity'] ?? 3);
@@ -34,6 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $numberQuantity,
             $specialQuantity
         );
+
+        $strengthChecker = new PasswordStrength();
+        $strengthResult = $strengthChecker->evaluate($generatedPassword);
     }
 }
 ?>
@@ -59,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <main class="container">
     <section class="card generator-card">
         <h1>Password generator</h1>
-        <p>Version 4: enter the exact quantity required for each character group.</p>
+        <p>Version 5: generate exact quantities and check password strength.</p>
 
         <?php if ($message !== ''): ?>
             <div class="message error"><?= htmlspecialchars($message) ?></div>
@@ -88,14 +93,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit">Generate password</button>
         </form>
 
-        <?php if ($generatedPassword !== ''): ?>
+        <?php if ($generatedPassword !== '' && $strengthResult !== null): ?>
             <div class="result">
                 <p>Generated password:</p>
                 <div class="password-output">
                     <strong id="generated-password"><?= htmlspecialchars($generatedPassword) ?></strong>
                     <button class="copy-button" type="button" onclick="copyGeneratedPassword()">Copy</button>
                 </div>
-                <p class="small-note">Database saving will be added in a later version.</p>
+
+                <div class="strength-box">
+                    <p>Strength:
+                        <span class="strength-badge <?= htmlspecialchars($strengthResult['css_class']) ?>">
+                            <?= htmlspecialchars($strengthResult['label']) ?>
+                        </span>
+                    </p>
+
+                    <?php if ($strengthResult['tips'] !== []): ?>
+                        <ul class="tips-list">
+                            <?php foreach ($strengthResult['tips'] as $tip): ?>
+                                <li><?= htmlspecialchars($tip) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php else: ?>
+                        <p class="good-message">This password uses all recommended character groups.</p>
+                    <?php endif; ?>
+                </div>
+
+                <p class="small-note">Database saving and encryption will be added in a later version.</p>
             </div>
         <?php endif; ?>
     </section>

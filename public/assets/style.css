@@ -126,3 +126,49 @@ legend {
         grid-template-columns: 1fr;
     }
 }
+
+
+.strength-box {
+    margin-top: 18px;
+    border-top: 1px solid #d7e2f2;
+    padding-top: 13px;
+}
+
+.strength-box p {
+    margin: 0 0 9px;
+}
+
+.strength-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 3px 10px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.strength-badge.weak {
+    background: #ffe6ea;
+    color: #a82035;
+}
+
+.strength-badge.medium {
+    background: #fff0d5;
+    color: #8a5700;
+}
+
+.strength-badge.strong {
+    background: #e4f7e9;
+    color: #12652d;
+}
+
+.tips-list {
+    color: #637086;
+    margin: 5px 0 0;
+    padding-left: 22px;
+}
+
+.good-message {
+    color: #12652d;
+    font-size: 14px;
+}

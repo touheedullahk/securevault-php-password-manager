@@ -28,7 +28,7 @@ if (!isset($_SESSION['user_id'])) {
 <main class="container">
     <section class="welcome">
         <h1>Welcome, <?= htmlspecialchars($_SESSION['username']) ?>!</h1>
-        <p>The password generator now supports exact character quantities.</p>
+        <p>The generator now supports exact quantities and simple strength feedback.</p>
         <a class="button-link" href="generator.php">Open password generator</a>
     </section>
 
