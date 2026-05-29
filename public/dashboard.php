@@ -5,6 +5,9 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
 }
+
+require_once '../classes/TemporaryPasswordList.php';
+$temporaryList = new TemporaryPasswordList();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,6 +23,7 @@ if (!isset($_SESSION['user_id'])) {
         <nav>
             <a href="dashboard.php">Dashboard</a>
             <a href="generator.php">Generator</a>
+            <a href="temporary_vault.php">Temporary List (<?= $temporaryList->count() ?>)</a>
             <a href="logout.php">Logout</a>
         </nav>
     </div>
@@ -28,13 +32,26 @@ if (!isset($_SESSION['user_id'])) {
 <main class="container">
     <section class="welcome">
         <h1>Welcome, <?= htmlspecialchars($_SESSION['username']) ?>!</h1>
-        <p>The generator now supports exact quantities and simple strength feedback.</p>
-        <a class="button-link" href="generator.php">Open password generator</a>
+        <p>The generator now supports exact quantities, strength feedback and a temporary vault preview.</p>
     </section>
 
-    <section class="card placeholder">
-        <h2>Stored Password Vault</h2>
-        <p>Saving encrypted website or application passwords will be implemented in a later version.</p>
+    <section class="dashboard-grid">
+        <section class="card feature-card">
+            <h2>Password Generator</h2>
+            <p>Create a new password with exact character quantities and see its strength.</p>
+            <a class="button-link" href="generator.php">Generate password</a>
+        </section>
+
+        <section class="card feature-card">
+            <h2>Temporary List</h2>
+            <p>Preview saved records during this session only. Current temporary records: <strong><?= $temporaryList->count() ?></strong></p>
+            <a class="button-link secondary-link" href="temporary_vault.php">View temporary list</a>
+        </section>
+    </section>
+
+    <section class="roadmap-card">
+        <strong>Development note:</strong>
+        Temporary session records prepare the interface for the later encrypted MySQL password vault.
     </section>
 </main>
 </body>
