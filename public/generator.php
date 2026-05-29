@@ -10,31 +10,29 @@ require_once '../classes/PasswordGenerator.php';
 
 $message = '';
 $generatedPassword = '';
-$length = 12;
-$useLowercase = true;
-$useUppercase = true;
-$useNumbers = true;
-$useSpecial = false;
+
+$length = (int) ($_POST['length'] ?? 12);
+$lowercaseQuantity = (int) ($_POST['lowercase_quantity'] ?? 3);
+$uppercaseQuantity = (int) ($_POST['uppercase_quantity'] ?? 3);
+$numberQuantity = (int) ($_POST['number_quantity'] ?? 3);
+$specialQuantity = (int) ($_POST['special_quantity'] ?? 3);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $length = (int) ($_POST['length'] ?? 12);
-    $useLowercase = isset($_POST['lowercase']);
-    $useUppercase = isset($_POST['uppercase']);
-    $useNumbers = isset($_POST['numbers']);
-    $useSpecial = isset($_POST['special']);
+    $quantityTotal = $lowercaseQuantity + $uppercaseQuantity + $numberQuantity + $specialQuantity;
 
-    if (!$useLowercase && !$useUppercase && !$useNumbers && !$useSpecial) {
-        $message = 'Select at least one character type.';
-    } elseif ($length < 6 || $length > 40) {
+    if ($length < 6 || $length > 40) {
         $message = 'Password length must be between 6 and 40.';
+    } elseif ($lowercaseQuantity < 0 || $uppercaseQuantity < 0 || $numberQuantity < 0 || $specialQuantity < 0) {
+        $message = 'Character quantities cannot be negative.';
+    } elseif ($quantityTotal !== $length) {
+        $message = 'The four character quantities must add up to the total length.';
     } else {
         $generator = new PasswordGenerator();
         $generatedPassword = $generator->generate(
-            $length,
-            $useLowercase,
-            $useUppercase,
-            $useNumbers,
-            $useSpecial
+            $lowercaseQuantity,
+            $uppercaseQuantity,
+            $numberQuantity,
+            $specialQuantity
         );
     }
 }
@@ -59,9 +57,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </header>
 
 <main class="container">
-    <section class="card form-card">
+    <section class="card generator-card">
         <h1>Password generator</h1>
-        <p>Version 3: generate a password using selected character groups.</p>
+        <p>Version 4: enter the exact quantity required for each character group.</p>
 
         <?php if ($message !== ''): ?>
             <div class="message error"><?= htmlspecialchars($message) ?></div>
@@ -72,29 +70,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="number" name="length" min="6" max="40" value="<?= $length ?>" required>
             </label>
 
-            <fieldset>
-                <legend>Include characters</legend>
-
-                <label class="checkbox">
-                    <input type="checkbox" name="lowercase" <?= $useLowercase ? 'checked' : '' ?>>
-                    Lowercase letters
+            <div class="quantity-grid">
+                <label>Lowercase letters
+                    <input type="number" name="lowercase_quantity" min="0" max="40" value="<?= $lowercaseQuantity ?>" required>
                 </label>
-
-                <label class="checkbox">
-                    <input type="checkbox" name="uppercase" <?= $useUppercase ? 'checked' : '' ?>>
-                    Uppercase letters
+                <label>Uppercase letters
+                    <input type="number" name="uppercase_quantity" min="0" max="40" value="<?= $uppercaseQuantity ?>" required>
                 </label>
-
-                <label class="checkbox">
-                    <input type="checkbox" name="numbers" <?= $useNumbers ? 'checked' : '' ?>>
-                    Numbers
+                <label>Numbers
+                    <input type="number" name="number_quantity" min="0" max="40" value="<?= $numberQuantity ?>" required>
                 </label>
-
-                <label class="checkbox">
-                    <input type="checkbox" name="special" <?= $useSpecial ? 'checked' : '' ?>>
-                    Special characters
+                <label>Special characters
+                    <input type="number" name="special_quantity" min="0" max="40" value="<?= $specialQuantity ?>" required>
                 </label>
-            </fieldset>
+            </div>
 
             <button type="submit">Generate password</button>
         </form>
@@ -102,10 +91,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if ($generatedPassword !== ''): ?>
             <div class="result">
                 <p>Generated password:</p>
-                <strong><?= htmlspecialchars($generatedPassword) ?></strong>
+                <div class="password-output">
+                    <strong id="generated-password"><?= htmlspecialchars($generatedPassword) ?></strong>
+                    <button class="copy-button" type="button" onclick="copyGeneratedPassword()">Copy</button>
+                </div>
+                <p class="small-note">Database saving will be added in a later version.</p>
             </div>
         <?php endif; ?>
     </section>
 </main>
+<script src="assets/app.js"></script>
 </body>
 </html>

@@ -91,3 +91,38 @@ legend {
     font-family: Consolas, monospace;
     word-break: break-all;
 }
+
+
+.generator-card {
+    width: min(100%, 620px);
+    margin: 0 auto;
+}
+
+.quantity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.password-output {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+}
+
+.copy-button {
+    width: auto;
+    padding: 8px 14px;
+}
+
+.small-note {
+    font-size: 13px;
+    margin: 12px 0 0;
+}
+
+@media (max-width: 560px) {
+    .quantity-grid {
+        grid-template-columns: 1fr;
+    }
+}
