@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['vault_key'])) {
 require_once '../classes/Database.php';
 require_once '../classes/EncryptionService.php';
 require_once '../classes/PasswordRecord.php';
+require_once '../classes/Security.php';
 
 $config = require '../config/config.php';
 $database = new Database($config);
@@ -16,9 +17,15 @@ $passwordRecord = new PasswordRecord($database->getConnection());
 $vaultKey = base64_decode($_SESSION['vault_key']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove'])) {
-    $passwordRecord->remove((int) $_POST['record_id'], (int) $_SESSION['user_id']);
-    $_SESSION['vault_message'] = 'Saved password removed.';
-    $_SESSION['vault_message_type'] = 'success';
+    if (!Security::checkCsrfToken($_POST['csrf_token'] ?? '')) {
+        $_SESSION['vault_message'] = 'Invalid form request. Please try again.';
+        $_SESSION['vault_message_type'] = 'error';
+    } else {
+        $passwordRecord->remove((int) $_POST['record_id'], (int) $_SESSION['user_id']);
+        $_SESSION['vault_message'] = 'Saved password removed.';
+        $_SESSION['vault_message_type'] = 'success';
+    }
+
     header('Location: vault.php');
     exit;
 }
@@ -44,6 +51,7 @@ unset($_SESSION['vault_message'], $_SESSION['vault_message_type']);
             <a href="generator.php">Generator</a>
             <a href="vault.php">Saved Vault</a>
             <a href="add_password.php">Add Existing</a>
+            <a href="change_password.php">Change Login Password</a>
             <a href="logout.php">Logout</a>
         </nav>
     </div>
@@ -94,6 +102,7 @@ unset($_SESSION['vault_message'], $_SESSION['vault_message_type']);
                         <td><?= htmlspecialchars($record['created_at']) ?></td>
                         <td>
                             <form method="post">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(Security::createCsrfToken()) ?>">
                                 <input type="hidden" name="record_id" value="<?= (int) $record['id'] ?>">
                                 <button class="danger-button tiny-button" type="submit" name="remove" value="1">Remove</button>
                             </form>

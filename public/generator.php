@@ -8,6 +8,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['vault_key'])) {
 
 require_once '../classes/PasswordGenerator.php';
 require_once '../classes/PasswordStrength.php';
+require_once '../classes/Security.php';
 
 $message = '';
 $generatedPassword = '';
@@ -22,7 +23,9 @@ $specialQuantity = (int) ($_POST['special_quantity'] ?? 3);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $quantityTotal = $lowercaseQuantity + $uppercaseQuantity + $numberQuantity + $specialQuantity;
 
-    if ($length < 6 || $length > 40) {
+    if (!Security::checkCsrfToken($_POST['csrf_token'] ?? '')) {
+        $message = 'Invalid form request. Please try again.';
+    } elseif ($length < 6 || $length > 40) {
         $message = 'Password length must be between 6 and 40.';
     } elseif ($lowercaseQuantity < 0 || $uppercaseQuantity < 0 || $numberQuantity < 0 || $specialQuantity < 0) {
         $message = 'Character quantities cannot be negative.';
@@ -57,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="dashboard.php">Dashboard</a>
             <a href="generator.php">Generator</a>
             <a href="vault.php">Saved Vault</a>
+            <a href="change_password.php">Change Login Password</a>
             <a href="logout.php">Logout</a>
         </nav>
     </div>
@@ -65,13 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <main class="container">
     <section class="card generator-card">
         <h1>Password generator</h1>
-        <p>Version 7: generated passwords can now be saved in an encrypted MySQL vault.</p>
+        <p>Generate exact character quantities, review strength, then save securely.</p>
 
         <?php if ($message !== ''): ?>
             <div class="message error"><?= htmlspecialchars($message) ?></div>
         <?php endif; ?>
 
         <form method="post">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(Security::createCsrfToken()) ?>">
             <label>Password length
                 <input type="number" name="length" min="6" max="40" value="<?= $length ?>" required>
             </label>
@@ -111,9 +116,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <form class="temporary-form" action="save_password.php" method="post">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(Security::createCsrfToken()) ?>">
                     <input type="hidden" name="password" value="<?= htmlspecialchars($generatedPassword) ?>">
                     <label>Website or program name
-                        <input type="text" name="service_name" maxlength="60" placeholder="Example: Gmail" required>
+                        <input type="text" name="service_name" maxlength="60" placeholder="Example: Gmail Demo" required>
                     </label>
                     <button class="secondary-button" type="submit">Save encrypted password</button>
                 </form>

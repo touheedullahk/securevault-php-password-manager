@@ -5,6 +5,8 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['vault_key'])) {
     header('Location: login.php');
     exit;
 }
+
+require_once '../classes/Security.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,6 +23,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['vault_key'])) {
             <a href="dashboard.php">Dashboard</a>
             <a href="generator.php">Generator</a>
             <a href="vault.php">Saved Vault</a>
+            <a href="change_password.php">Change Login Password</a>
             <a href="logout.php">Logout</a>
         </nav>
     </div>
@@ -32,6 +35,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['vault_key'])) {
         <p>Store a desired password for a website or program using the encrypted vault.</p>
 
         <form action="save_password.php" method="post">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(Security::createCsrfToken()) ?>">
             <label>Website or program name
                 <input type="text" name="service_name" maxlength="60" required>
             </label>

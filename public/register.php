@@ -5,6 +5,7 @@ require_once '../classes/Database.php';
 require_once '../classes/EncryptionService.php';
 require_once '../classes/User.php';
 require_once '../classes/Validator.php';
+require_once '../classes/Security.php';
 
 $config = require '../config/config.php';
 $message = '';
@@ -21,15 +22,19 @@ try {
         $password = $_POST['password'] ?? '';
         $confirmPassword = $_POST['confirm_password'] ?? '';
 
-        $message = $validator->validateRegistration($username, $password, $confirmPassword);
-
-        if ($message === '') {
-            $message = $user->register($username, $password);
+        if (!Security::checkCsrfToken($_POST['csrf_token'] ?? '')) {
+            $message = 'Invalid form request. Please try again.';
+        } else {
+            $message = $validator->validateRegistration($username, $password, $confirmPassword);
 
             if ($message === '') {
-                $success = true;
-                $message = 'Account created successfully. You may now log in.';
-                $username = '';
+                $message = $user->register($username, $password);
+
+                if ($message === '') {
+                    $success = true;
+                    $message = 'Account created successfully. You may now log in.';
+                    $username = '';
+                }
             }
         }
     }
@@ -55,7 +60,7 @@ try {
 <main class="container">
     <section class="card form-card">
         <h1>Create account</h1>
-        <p>Version 7: registration also creates your encrypted vault key.</p>
+        <p>Registration creates your personal encrypted vault key.</p>
 
         <?php if ($message !== ''): ?>
             <div class="message <?= $success ? 'success' : 'error' ?>">
@@ -64,22 +69,18 @@ try {
         <?php endif; ?>
 
         <form method="post">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(Security::createCsrfToken()) ?>">
             <label>Username
-                <input type="text" name="username" required maxlength="30"
-                       value="<?= htmlspecialchars($username) ?>">
+                <input type="text" name="username" required maxlength="30" value="<?= htmlspecialchars($username) ?>">
             </label>
-
             <label>Password
                 <input type="password" name="password" required minlength="8">
             </label>
-
             <label>Confirm password
                 <input type="password" name="confirm_password" required minlength="8">
             </label>
-
             <button type="submit">Register</button>
         </form>
-
         <p class="hint">Username: letters, numbers or underscore. Password: at least 8 characters with a letter and a number.</p>
         <p class="link-line">Already registered? <a href="login.php">Login here</a></p>
     </section>

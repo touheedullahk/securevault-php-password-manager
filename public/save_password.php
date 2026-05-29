@@ -9,6 +9,14 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['vault_key'])) {
 require_once '../classes/Database.php';
 require_once '../classes/EncryptionService.php';
 require_once '../classes/PasswordRecord.php';
+require_once '../classes/Security.php';
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Security::checkCsrfToken($_POST['csrf_token'] ?? '')) {
+    $_SESSION['vault_message'] = 'Invalid form request. Please try again.';
+    $_SESSION['vault_message_type'] = 'error';
+    header('Location: vault.php');
+    exit;
+}
 
 $config = require '../config/config.php';
 $database = new Database($config);

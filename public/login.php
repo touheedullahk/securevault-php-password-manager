@@ -4,9 +4,11 @@ session_start();
 require_once '../classes/Database.php';
 require_once '../classes/EncryptionService.php';
 require_once '../classes/User.php';
+require_once '../classes/Security.php';
 
 $config = require '../config/config.php';
 $message = '';
+$username = '';
 
 if (isset($_SESSION['user_id'])) {
     header('Location: dashboard.php');
@@ -18,14 +20,17 @@ try {
     $user = new User($database->getConnection());
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $username = $_POST['username'] ?? '';
+        $username = trim($_POST['username'] ?? '');
         $password = $_POST['password'] ?? '';
 
-        if ($user->login($username, $password)) {
+        if (!Security::checkCsrfToken($_POST['csrf_token'] ?? '')) {
+            $message = 'Invalid form request. Please try again.';
+        } elseif ($user->login($username, $password)) {
             header('Location: dashboard.php');
             exit;
+        } else {
+            $message = 'Incorrect username or password.';
         }
-        $message = 'Incorrect username or password.';
     }
 } catch (PDOException $error) {
     $message = 'Database connection failed. Import database/schema.sql first.';
@@ -45,6 +50,7 @@ try {
         <nav><a href="login.php">Login</a><a href="register.php">Register</a></nav>
     </div>
 </header>
+
 <main class="container">
     <section class="card form-card">
         <h1>Login</h1>
@@ -55,8 +61,9 @@ try {
         <?php endif; ?>
 
         <form method="post">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(Security::createCsrfToken()) ?>">
             <label>Username
-                <input type="text" name="username" required>
+                <input type="text" name="username" required value="<?= htmlspecialchars($username) ?>">
             </label>
             <label>Password
                 <input type="password" name="password" required>

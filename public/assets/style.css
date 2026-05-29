@@ -323,3 +323,10 @@ legend {
         grid-template-columns: 1fr;
     }
 }
+
+
+.roadmap-card.completed {
+    background: #e7f8ed;
+    border-color: #c3ead0;
+    color: #12652d;
+}
