@@ -2,6 +2,7 @@
 session_start();
 
 require_once '../classes/Database.php';
+require_once '../classes/EncryptionService.php';
 require_once '../classes/User.php';
 
 $config = require '../config/config.php';
@@ -47,7 +48,7 @@ try {
 <main class="container">
     <section class="card form-card">
         <h1>Login</h1>
-        <p>Sign in to the starter application.</p>
+        <p>Sign in to unlock your encrypted saved-password vault.</p>
 
         <?php if ($message !== ''): ?>
             <div class="message error"><?= htmlspecialchars($message) ?></div>

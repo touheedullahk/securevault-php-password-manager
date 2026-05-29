@@ -14,3 +14,16 @@ function copyText(elementId, button) {
         }, 1200);
     });
 }
+
+function showOrHidePassword(maskedId, realId, button) {
+    const maskedElement = document.getElementById(maskedId);
+    const realPassword = document.getElementById(realId).textContent;
+
+    if (button.textContent === 'Show') {
+        maskedElement.textContent = realPassword;
+        button.textContent = 'Hide';
+    } else {
+        maskedElement.textContent = '••••••••';
+        button.textContent = 'Show';
+    }
+}

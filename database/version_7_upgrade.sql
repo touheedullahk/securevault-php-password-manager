@@ -1,15 +1,7 @@
-CREATE DATABASE IF NOT EXISTS securevault
-CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 USE securevault;
 
-CREATE TABLE IF NOT EXISTS users (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    encrypted_vault_key TEXT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+ALTER TABLE users
+    ADD COLUMN encrypted_vault_key TEXT NULL AFTER password_hash;
 
 CREATE TABLE IF NOT EXISTS password_records (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

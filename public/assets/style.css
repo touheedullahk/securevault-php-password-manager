@@ -304,3 +304,22 @@ legend {
         flex-direction: column;
     }
 }
+
+
+.hidden-password {
+    display: none;
+}
+
+.dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.records-table code {
+    min-width: 95px;
+}
+
+@media (max-width: 820px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -2,6 +2,7 @@
 session_start();
 
 require_once '../classes/Database.php';
+require_once '../classes/EncryptionService.php';
 require_once '../classes/User.php';
 require_once '../classes/Validator.php';
 
@@ -54,7 +55,7 @@ try {
 <main class="container">
     <section class="card form-card">
         <h1>Create account</h1>
-        <p>Version 2: improved validation and safer login session handling.</p>
+        <p>Version 7: registration also creates your encrypted vault key.</p>
 
         <?php if ($message !== ''): ?>
             <div class="message <?= $success ? 'success' : 'error' ?>">

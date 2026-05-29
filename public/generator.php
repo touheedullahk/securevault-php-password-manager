@@ -1,20 +1,17 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['vault_key'])) {
     header('Location: login.php');
     exit;
 }
 
 require_once '../classes/PasswordGenerator.php';
 require_once '../classes/PasswordStrength.php';
-require_once '../classes/TemporaryPasswordList.php';
 
 $message = '';
-$successMessage = '';
 $generatedPassword = '';
 $strengthResult = null;
-$temporaryList = new TemporaryPasswordList();
 
 $length = (int) ($_POST['length'] ?? 12);
 $lowercaseQuantity = (int) ($_POST['lowercase_quantity'] ?? 3);
@@ -23,42 +20,23 @@ $numberQuantity = (int) ($_POST['number_quantity'] ?? 3);
 $specialQuantity = (int) ($_POST['special_quantity'] ?? 3);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['add_temporary'])) {
-        $generatedPassword = $_POST['generated_password'] ?? '';
+    $quantityTotal = $lowercaseQuantity + $uppercaseQuantity + $numberQuantity + $specialQuantity;
 
-        if ($generatedPassword === '') {
-            $message = 'Generate a password before adding it to your temporary list.';
-        } else {
-            $message = $temporaryList->add(
-                $_POST['service_name'] ?? '',
-                $generatedPassword
-            );
-
-            if ($message === '') {
-                $successMessage = 'Password added to the temporary list for this session.';
-            }
-        }
+    if ($length < 6 || $length > 40) {
+        $message = 'Password length must be between 6 and 40.';
+    } elseif ($lowercaseQuantity < 0 || $uppercaseQuantity < 0 || $numberQuantity < 0 || $specialQuantity < 0) {
+        $message = 'Character quantities cannot be negative.';
+    } elseif ($quantityTotal !== $length) {
+        $message = 'The four character quantities must add up to the total length.';
     } else {
-        $quantityTotal = $lowercaseQuantity + $uppercaseQuantity + $numberQuantity + $specialQuantity;
+        $generator = new PasswordGenerator();
+        $generatedPassword = $generator->generate(
+            $lowercaseQuantity,
+            $uppercaseQuantity,
+            $numberQuantity,
+            $specialQuantity
+        );
 
-        if ($length < 6 || $length > 40) {
-            $message = 'Password length must be between 6 and 40.';
-        } elseif ($lowercaseQuantity < 0 || $uppercaseQuantity < 0 || $numberQuantity < 0 || $specialQuantity < 0) {
-            $message = 'Character quantities cannot be negative.';
-        } elseif ($quantityTotal !== $length) {
-            $message = 'The four character quantities must add up to the total length.';
-        } else {
-            $generator = new PasswordGenerator();
-            $generatedPassword = $generator->generate(
-                $lowercaseQuantity,
-                $uppercaseQuantity,
-                $numberQuantity,
-                $specialQuantity
-            );
-        }
-    }
-
-    if ($generatedPassword !== '') {
         $strengthChecker = new PasswordStrength();
         $strengthResult = $strengthChecker->evaluate($generatedPassword);
     }
@@ -78,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <nav>
             <a href="dashboard.php">Dashboard</a>
             <a href="generator.php">Generator</a>
-            <a href="temporary_vault.php">Temporary List (<?= $temporaryList->count() ?>)</a>
+            <a href="vault.php">Saved Vault</a>
             <a href="logout.php">Logout</a>
         </nav>
     </div>
@@ -87,14 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <main class="container">
     <section class="card generator-card">
         <h1>Password generator</h1>
-        <p>Version 6: generate a password and optionally preview it in a temporary vault list.</p>
+        <p>Version 7: generated passwords can now be saved in an encrypted MySQL vault.</p>
 
         <?php if ($message !== ''): ?>
             <div class="message error"><?= htmlspecialchars($message) ?></div>
-        <?php endif; ?>
-
-        <?php if ($successMessage !== ''): ?>
-            <div class="message success"><?= htmlspecialchars($successMessage) ?></div>
         <?php endif; ?>
 
         <form method="post">
@@ -136,26 +110,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </p>
                 </div>
 
-                <form class="temporary-form" method="post">
-                    <input type="hidden" name="generated_password" value="<?= htmlspecialchars($generatedPassword) ?>">
-                    <input type="hidden" name="length" value="<?= $length ?>">
-                    <input type="hidden" name="lowercase_quantity" value="<?= $lowercaseQuantity ?>">
-                    <input type="hidden" name="uppercase_quantity" value="<?= $uppercaseQuantity ?>">
-                    <input type="hidden" name="number_quantity" value="<?= $numberQuantity ?>">
-                    <input type="hidden" name="special_quantity" value="<?= $specialQuantity ?>">
-
+                <form class="temporary-form" action="save_password.php" method="post">
+                    <input type="hidden" name="password" value="<?= htmlspecialchars($generatedPassword) ?>">
                     <label>Website or program name
-                        <input type="text" name="service_name" maxlength="60" placeholder="Example: Gmail Demo" required>
+                        <input type="text" name="service_name" maxlength="60" placeholder="Example: Gmail" required>
                     </label>
-
-                    <button class="secondary-button" type="submit" name="add_temporary" value="1">
-                        Add to temporary list
-                    </button>
+                    <button class="secondary-button" type="submit">Save encrypted password</button>
                 </form>
-
-                <p class="warning-note">
-                    Temporary preview only: records disappear when you log out. Encrypted database saving will be added later.
-                </p>
             </div>
         <?php endif; ?>
     </section>

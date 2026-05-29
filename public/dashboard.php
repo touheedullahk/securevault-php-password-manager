@@ -1,13 +1,10 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['vault_key'])) {
     header('Location: login.php');
     exit;
 }
-
-require_once '../classes/TemporaryPasswordList.php';
-$temporaryList = new TemporaryPasswordList();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,7 +20,8 @@ $temporaryList = new TemporaryPasswordList();
         <nav>
             <a href="dashboard.php">Dashboard</a>
             <a href="generator.php">Generator</a>
-            <a href="temporary_vault.php">Temporary List (<?= $temporaryList->count() ?>)</a>
+            <a href="vault.php">Saved Vault</a>
+            <a href="add_password.php">Add Existing</a>
             <a href="logout.php">Logout</a>
         </nav>
     </div>
@@ -32,26 +30,32 @@ $temporaryList = new TemporaryPasswordList();
 <main class="container">
     <section class="welcome">
         <h1>Welcome, <?= htmlspecialchars($_SESSION['username']) ?>!</h1>
-        <p>The generator now supports exact quantities, strength feedback and a temporary vault preview.</p>
+        <p>Version 7 introduces encrypted MySQL storage for your generated or desired passwords.</p>
     </section>
 
     <section class="dashboard-grid">
         <section class="card feature-card">
-            <h2>Password Generator</h2>
-            <p>Create a new password with exact character quantities and see its strength.</p>
+            <h2>Generate Password</h2>
+            <p>Create a password with exact character quantities and save it securely.</p>
             <a class="button-link" href="generator.php">Generate password</a>
         </section>
 
         <section class="card feature-card">
-            <h2>Temporary List</h2>
-            <p>Preview saved records during this session only. Current temporary records: <strong><?= $temporaryList->count() ?></strong></p>
-            <a class="button-link secondary-link" href="temporary_vault.php">View temporary list</a>
+            <h2>Saved Vault</h2>
+            <p>View passwords saved in the database as encrypted values.</p>
+            <a class="button-link secondary-link" href="vault.php">View saved vault</a>
+        </section>
+
+        <section class="card feature-card">
+            <h2>Add Existing</h2>
+            <p>Store a password you already use for a website or program.</p>
+            <a class="button-link secondary-link" href="add_password.php">Add password</a>
         </section>
     </section>
 
     <section class="roadmap-card">
-        <strong>Development note:</strong>
-        Temporary session records prepare the interface for the later encrypted MySQL password vault.
+        <strong>Next development step:</strong>
+        allow the user to change the login password while safely re-encrypting the unchanged vault key.
     </section>
 </main>
 </body>
